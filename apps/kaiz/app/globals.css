@@ -2,22 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --ink: #0A0E1A;
-  --ink-2: #131824;
-  --ink-3: #1C212E;
-  --ivory: #F8F8F6;
-  --ivory-2: #D4D4D0;
-  --ivory-3: #A8A8A0;
-  --lime: #E8FF4A;
-}
-
 @layer base {
   * {
-    @apply border-ivory/10;
+    @apply border-line;
   }
   body {
-    @apply bg-ink text-ivory font-sans antialiased;
+    @apply bg-bg text-text font-sans antialiased;
   }
 }
 

@@ -2,24 +2,24 @@ import Link from 'next/link';
 
 export function Header() {
   return (
-    <header className="border-b border-ivory/10 bg-ink-2">
+    <header className="border-b border-line bg-bg-2">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="text-2xl font-medium">KAIZ</div>
-            <div className="h-4 w-px bg-lime" />
-            <div className="text-sm text-ivory-3">Dubai, UAE</div>
+            <div className="text-h4 font-medium text-text">KAIZ</div>
+            <div className="h-4 w-px bg-green" />
+            <div className="text-body-s text-text-2">Dubai, UAE</div>
           </Link>
 
           <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm hover:text-lime transition">
+            <Link href="/" className="text-body-s hover:text-green transition">
               Dashboard
             </Link>
-            <Link href="/demo" className="text-sm hover:text-lime transition">
+            <Link href="/demo" className="text-body-s hover:text-green transition">
               Quick Demo
             </Link>
-            <div className="px-4 py-2 bg-lime/10 rounded-lg text-sm">
-              <span className="text-ivory-3">Testnet</span>
+            <div className="px-4 py-2 bg-green-tint rounded-lg text-body-s">
+              <span className="text-green">Testnet</span>
             </div>
           </nav>
         </div>

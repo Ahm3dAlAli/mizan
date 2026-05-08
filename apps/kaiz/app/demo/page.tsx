@@ -118,14 +118,14 @@ export default function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-bg">
       <div className="container mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-medium mb-4">
+          <h1 className="text-h2 font-medium mb-4 text-text">
             Quick Demo: AI Agent Payroll Run
           </h1>
-          <p className="text-ivory-3 text-lg max-w-2xl">
+          <p className="text-text-2 text-body-l max-w-2xl">
             Watch 5 AI agents autonomously process a payroll batch of 12 invoices
             across 3 countries using Circle USDC and Arc Network.
           </p>
@@ -136,10 +136,10 @@ export default function DemoPage() {
           <button
             onClick={startDemo}
             disabled={isRunning}
-            className={`px-8 py-4 rounded-lg font-medium transition ${
+            className={`px-8 py-4 rounded-lg font-medium transition shadow-sm ${
               isRunning
-                ? 'bg-ivory/10 text-ivory-3 cursor-not-allowed'
-                : 'bg-lime text-ink hover:bg-lime-dim'
+                ? 'bg-bg-2 text-text-3 cursor-not-allowed'
+                : 'bg-green text-bg-elev hover:bg-green-2'
             }`}
           >
             {isRunning ? 'Running...' : 'Start Payroll Run'}
@@ -149,8 +149,8 @@ export default function DemoPage() {
         {/* Agent Actions Log */}
         {visibleActions > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
-              <div className="w-2 h-2 bg-lime rounded-full animate-pulse" />
+            <h2 className="text-h3 font-medium mb-6 flex items-center gap-3 text-text">
+              <div className="w-2 h-2 bg-green rounded-full animate-pulse" />
               Agent Activity
             </h2>
             <div className="space-y-4">
@@ -171,8 +171,8 @@ export default function DemoPage() {
         {/* Transactions */}
         {visibleTransactions > 0 && (
           <div>
-            <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+            <h2 className="text-h3 font-medium mb-6 flex items-center gap-3 text-text">
+              <div className="w-2 h-2 bg-green rounded-full" />
               Completed Transactions
             </h2>
             <div className="space-y-4">
@@ -194,28 +194,28 @@ export default function DemoPage() {
 
         {/* Info Footer */}
         {!isRunning && visibleActions === 0 && (
-          <div className="mt-12 p-6 bg-ink-2 rounded-lg border border-ivory/10">
-            <h3 className="text-xl font-medium mb-3">What you'll see:</h3>
-            <ul className="space-y-2 text-ivory-3">
+          <div className="mt-12 p-6 bg-bg-elev rounded-lg border border-line shadow-card">
+            <h3 className="text-h4 font-medium mb-3 text-text">What you'll see:</h3>
+            <ul className="space-y-2 text-body-s text-text-2">
               <li className="flex items-start gap-2">
-                <span className="text-lime">→</span>
-                <span><strong className="text-ivory">5 AI agents</strong> reasoning through the payroll process</span>
+                <span className="text-green">→</span>
+                <span><strong className="text-text">5 AI agents</strong> reasoning through the payroll process</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-lime">→</span>
-                <span><strong className="text-ivory">Real-time orchestration</strong> with LangGraph + Claude</span>
+                <span className="text-green">→</span>
+                <span><strong className="text-text">Real-time orchestration</strong> with LangGraph + Claude</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-lime">→</span>
-                <span><strong className="text-ivory">3 cross-border corridors</strong> (UAE → Philippines, India, Egypt)</span>
+                <span className="text-green">→</span>
+                <span><strong className="text-text">3 cross-border corridors</strong> (UAE → Philippines, India, Egypt)</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-lime">→</span>
-                <span><strong className="text-ivory">Circle USDC settlement</strong> on Arc Testnet</span>
+                <span className="text-green">→</span>
+                <span><strong className="text-text">Circle USDC settlement</strong> on Arc Testnet</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-lime">→</span>
-                <span><strong className="text-ivory">Sub-3s settlement times</strong> with full compliance checks</span>
+                <span className="text-green">→</span>
+                <span><strong className="text-text">Sub-3s settlement times</strong> with full compliance checks</span>
               </li>
             </ul>
           </div>
