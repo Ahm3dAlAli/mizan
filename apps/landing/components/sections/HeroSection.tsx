@@ -49,7 +49,7 @@ export function HeroSection() {
           <a href="http://localhost:3000/demo" className="hover:text-lime transition">
             Demo
           </a>
-          <a href="https://github.com/your-username/arcpay" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
+          <a href="https://github.com/Ahm3dAlAli/arcpay-main" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
             GitHub ↗
           </a>
           <a href="#docs" className="hover:text-lime transition">
@@ -101,7 +101,7 @@ export function HeroSection() {
             Watch the Demo →
           </a>
           <a
-            href="https://github.com/your-username/arcpay"
+            href="https://github.com/Ahm3dAlAli/arcpay-main"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 border border-lime/20 text-lime rounded-lg font-medium hover:bg-lime/10 transition"

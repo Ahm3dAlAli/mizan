@@ -97,7 +97,7 @@ export function ArchitectureSection() {
 
           <div className="text-center">
             <a
-              href="https://github.com/your-username/arcpay/blob/main/FORK.md"
+              href="https://github.com/Ahm3dAlAli/arcpay-main/blob/main/FORK.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-6 py-3 bg-forest text-ivory rounded-lg hover:bg-forest-dim transition"

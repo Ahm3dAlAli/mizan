@@ -57,7 +57,7 @@ export function AttributionSection() {
             </div>
 
             <a
-              href="https://github.com/your-username/arcpay/blob/main/FORK.md"
+              href="https://github.com/Ahm3dAlAli/arcpay-main/blob/main/FORK.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block text-lime hover:underline mt-4"

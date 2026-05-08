@@ -316,6 +316,6 @@ MIT License - See [LICENSE](/LICENSE)
 ---
 
 **Live Demo**: http://localhost:3001
-**GitHub**: https://github.com/your-username/arcpay
+**GitHub**: https://github.com/Ahm3dAlAli/arcpay-main
 
 Built with ❤️ for the agentic economy.

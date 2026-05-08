@@ -356,7 +356,7 @@ The Kaiz MVP is now complete and ready for demonstration. The Quick Demo page at
 ---
 
 **Demo**: http://localhost:3000/demo
-**GitHub**: https://github.com/your-username/arcpay (update with actual URL)
+**GitHub**: https://github.com/Ahm3dAlAli/arcpay-main
 **Status**: ✅ Ready for Hackathon Submission
 
 Built with ❤️ for the agentic economy.

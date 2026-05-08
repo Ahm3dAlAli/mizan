@@ -28,7 +28,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://github.com/your-username/arcpay" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
+                <a href="https://github.com/Ahm3dAlAli/arcpay-main" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
                   GitHub ↗
                 </a>
               </li>
@@ -40,12 +40,12 @@ export function Footer() {
             <h3 className="text-sm font-medium uppercase tracking-wider text-ivory-2">Resources</h3>
             <ul className="space-y-2 text-sm text-ivory-3">
               <li>
-                <a href="https://github.com/your-username/arcpay/blob/main/FORK.md" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
+                <a href="https://github.com/Ahm3dAlAli/arcpay-main/blob/main/FORK.md" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
                   Attribution
                 </a>
               </li>
               <li>
-                <a href="https://github.com/your-username/arcpay/blob/main/MIZAN_README.md" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
+                <a href="https://github.com/Ahm3dAlAli/arcpay-main/blob/main/MIZAN_README.md" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
                   Architecture
                 </a>
               </li>
@@ -72,7 +72,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="pt-8 border-t border-ivory/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-ivory-3">
           <div>
-            Built on <a href="https://github.com/your-username/arcpay" target="_blank" rel="noopener noreferrer" className="text-lime hover:underline">ArcPay</a> (3 Arc Hackathon awards)
+            Built on <a href="https://github.com/Ahm3dAlAli/arcpay-main" target="_blank" rel="noopener noreferrer" className="text-lime hover:underline">ArcPay</a> (3 Arc Hackathon awards)
           </div>
           <div className="flex items-center gap-6">
             <span>Stablecoins Commerce Stack Challenge 2026</span>

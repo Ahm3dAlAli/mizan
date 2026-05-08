@@ -384,7 +384,7 @@ The Mizan landing site is **production ready**. All 10 sections are polished and
 
 **Live Demo**: http://localhost:3001
 **Kaiz Demo**: http://localhost:3000/demo
-**GitHub**: https://github.com/your-username/arcpay
+**GitHub**: https://github.com/Ahm3dAlAli/arcpay-main
 **Status**: ✅ 93% Complete - Ready for Deployment
 
 Built with ❤️ for the agentic economy.
