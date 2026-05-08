@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export function AttributionSection() {
   return (
-    <section className="py-32 px-6 bg-ivory border-y border-lime/20">
+    <section className="py-32 px-6 bg-bg-2 border-y border-line">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -14,44 +14,44 @@ export function AttributionSection() {
           className="space-y-8"
         >
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-1 h-8 bg-lime" />
-            <h2 className="text-xs uppercase tracking-wider text-lime font-medium">
+            <div className="w-1 h-8 bg-green" />
+            <h2 className="text-eyebrow text-green">
               INFRASTRUCTURE STANDS ON INFRASTRUCTURE
             </h2>
           </div>
 
-          <div className="space-y-6 text-forest">
-            <p className="text-lg leading-relaxed">
+          <div className="space-y-6 text-text">
+            <p className="text-body-l leading-relaxed">
               Mizan extends <strong>ArcPay</strong>—the 3-award-winning Arc SDK by Himess
               (MIT, January 2026 Arc Hackathon: Best Dev Tools, Best Trustless AI Agent,
               Best Gateway-Based Micropayments).
             </p>
 
-            <p className="text-lg leading-relaxed">
+            <p className="text-body-l leading-relaxed">
               ArcPay solved the payment-primitive layer. Mizan adds the layers above it that
               agents and SMEs need:
             </p>
 
-            <div className="space-y-3 text-base">
+            <div className="space-y-3 text-body-s">
               <div className="flex items-start gap-3">
-                <span className="text-lime mt-1">▸</span>
+                <span className="text-green mt-1">▸</span>
                 <div>
                   <strong>Corridor configurations</strong>
-                  <span className="text-forest-dim ml-2">5 UAE → Global lanes</span>
+                  <span className="text-text-2 ml-2">5 UAE → Global lanes</span>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-lime mt-1">▸</span>
+                <span className="text-green mt-1">▸</span>
                 <div>
                   <strong>Multi-agent orchestration</strong>
-                  <span className="text-forest-dim ml-2">LangGraph, 5 specialists</span>
+                  <span className="text-text-2 ml-2">LangGraph, 5 specialists</span>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-lime mt-1">▸</span>
+                <span className="text-green mt-1">▸</span>
                 <div>
                   <strong>SME demo application</strong>
-                  <span className="text-forest-dim ml-2">Dubai agency payroll, e2e</span>
+                  <span className="text-text-2 ml-2">Dubai agency payroll, e2e</span>
                 </div>
               </div>
             </div>
@@ -60,7 +60,7 @@ export function AttributionSection() {
               href="https://github.com/Ahm3dAlAli/arcpay-main/blob/main/FORK.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block text-lime hover:underline mt-4"
+              className="inline-block text-green hover:underline mt-4"
             >
               See the full attribution and originality table →
             </a>

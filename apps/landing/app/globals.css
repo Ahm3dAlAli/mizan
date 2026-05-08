@@ -3,12 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
-    @apply bg-sand text-forest antialiased;
+    @apply bg-bg text-text antialiased;
   }
 
   html {

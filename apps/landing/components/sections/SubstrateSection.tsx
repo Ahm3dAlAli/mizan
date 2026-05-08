@@ -27,7 +27,7 @@ run.transactions[0].reasoning
 
 export function SubstrateSection() {
   return (
-    <section className="py-32 px-6 bg-ink text-ivory">
+    <section className="py-32 px-6 bg-bg-dark text-text-on-dark">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -37,39 +37,39 @@ export function SubstrateSection() {
           className="space-y-12"
         >
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-1 h-8 bg-lime" />
-            <h2 className="text-xs uppercase tracking-wider text-lime font-medium">
+            <div className="w-1 h-8 bg-green" />
+            <h2 className="text-eyebrow text-green">
               THE SUBSTRATE
             </h2>
           </div>
 
           <div className="space-y-8">
-            <h3 className="text-2xl md:text-3xl font-medium">
+            <h3 className="text-h3 font-medium">
               With Mizan, that same payroll run is 3 lines of code.
             </h3>
 
-            <div className="bg-ink-2 rounded-lg p-6 border border-lime/20">
-              <pre className="font-mono text-sm text-ivory-2 overflow-x-auto">
+            <div className="bg-bg-elev rounded-lg p-6 border border-line shadow-card">
+              <pre className="font-mono text-body-s text-text overflow-x-auto">
                 <code>{solutionCode}</code>
               </pre>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <div className="text-4xl text-lime">3s</div>
-                <div className="text-sm text-ivory-3">
+                <div className="text-h2 text-green">3s</div>
+                <div className="text-body-s text-text-on-dark-2">
                   Average settlement time (vs 2-5 days)
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl text-lime">1.0%</div>
-                <div className="text-sm text-ivory-3">
+                <div className="text-h2 text-green">1.0%</div>
+                <div className="text-body-s text-text-on-dark-2">
                   Corridor fees (vs 1.15% Wise average)
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl text-lime">100%</div>
-                <div className="text-sm text-ivory-3">
+                <div className="text-h2 text-green">100%</div>
+                <div className="text-body-s text-text-on-dark-2">
                   Transparent reasoning traces
                 </div>
               </div>

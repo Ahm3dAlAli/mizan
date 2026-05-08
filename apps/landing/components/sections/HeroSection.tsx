@@ -26,33 +26,33 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden bg-ink">
-      {/* Animated lime spotlight */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden bg-bg-dark">
+      {/* Animated green spotlight */}
       <motion.div
-        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[120px] bg-lime/20"
+        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[120px] bg-green-tint/30"
         animate={{ opacity: [0.2, 0.3, 0.2] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       {/* Navigation */}
       <motion.nav
-        className="absolute top-8 left-0 right-0 px-6 flex items-center justify-between max-w-7xl mx-auto"
+        className="absolute top-8 left-0 right-0 px-6 flex items-center justify-between max-w-container mx-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
         <div className="flex items-center gap-3">
-          <div className="text-lime text-2xl font-medium">MIZAN</div>
-          <div className="h-4 w-px bg-lime" />
+          <div className="text-green text-h4 font-medium">MIZAN</div>
+          <div className="h-4 w-px bg-green/30" />
         </div>
-        <div className="flex items-center gap-6 text-sm text-ivory-2">
-          <a href="http://localhost:3000/demo" className="hover:text-lime transition">
+        <div className="flex items-center gap-6 text-body-s text-text-on-dark-2">
+          <a href="http://localhost:3000/demo" className="hover:text-green-2 transition">
             Demo
           </a>
-          <a href="https://github.com/Ahm3dAlAli/arcpay-main" target="_blank" rel="noopener noreferrer" className="hover:text-lime transition">
+          <a href="https://github.com/Ahm3dAlAli/arcpay-main" target="_blank" rel="noopener noreferrer" className="hover:text-green-2 transition">
             GitHub ↗
           </a>
-          <a href="#docs" className="hover:text-lime transition">
+          <a href="#docs" className="hover:text-green-2 transition">
             Docs
           </a>
         </div>
@@ -62,7 +62,7 @@ export function HeroSection() {
       <div className="relative z-10 max-w-4xl mx-auto text-center space-y-12">
         {/* Logo/Title */}
         <motion.h1
-          className="text-6xl md:text-7xl font-medium text-lime"
+          className="text-h1 font-medium text-green"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -77,10 +77,10 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h2 className="text-4xl md:text-5xl font-medium text-ivory leading-tight">
+          <h2 className="text-h2 font-medium text-text-on-dark leading-tight">
             Agentic payment infrastructure for SMEs.
           </h2>
-          <p className="text-lg md:text-xl text-ivory-2 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-body-l text-text-on-dark-2 max-w-3xl mx-auto">
             Mizan is the first system that lets autonomous agents authenticate corridors,
             route value across chains, and settle SME payments in stablecoins—independently,
             transparently, instantly.
@@ -96,7 +96,7 @@ export function HeroSection() {
         >
           <a
             href="http://localhost:3000/demo"
-            className="px-8 py-4 bg-lime text-ink rounded-lg font-medium hover:bg-lime-dim transition"
+            className="px-8 py-4 bg-green text-bg-elev rounded-lg font-medium hover:bg-green-2 transition shadow-sm"
           >
             Watch the Demo →
           </a>
@@ -104,7 +104,7 @@ export function HeroSection() {
             href="https://github.com/Ahm3dAlAli/arcpay-main"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-4 border border-lime/20 text-lime rounded-lg font-medium hover:bg-lime/10 transition"
+            className="px-8 py-4 border border-line-on-dark text-text-on-dark rounded-lg font-medium hover:bg-green/10 transition"
           >
             GitHub ↗
           </a>
@@ -117,14 +117,14 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.5 }}
         >
-          <div className="relative bg-ivory rounded-lg p-6 text-left shadow-2xl">
+          <div className="relative bg-bg-elev rounded-lg p-6 text-left shadow-hero">
             <button
               onClick={handleCopy}
-              className="absolute top-4 right-4 px-3 py-1 text-xs bg-forest/10 text-forest rounded hover:bg-forest/20 transition"
+              className="absolute top-4 right-4 px-3 py-1 text-eyebrow bg-green-tint text-green rounded hover:bg-green-tint/70 transition"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>
-            <pre className="font-mono text-sm text-forest overflow-x-auto">
+            <pre className="font-mono text-body-s text-text overflow-x-auto">
               <code>{codeSnippet}</code>
             </pre>
           </div>
@@ -132,7 +132,7 @@ export function HeroSection() {
 
         {/* Attribution */}
         <motion.p
-          className="text-sm text-ivory-3"
+          className="text-body-s text-text-faint"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.0, duration: 0.5 }}
@@ -148,7 +148,7 @@ export function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        <div className="flex flex-col items-center gap-2 text-ivory-3 text-xs">
+        <div className="flex flex-col items-center gap-2 text-text-faint text-eyebrow">
           <span>Scroll to explore</span>
           <svg
             className="w-4 h-4 animate-bounce"
