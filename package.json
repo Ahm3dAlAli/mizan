@@ -41,7 +41,9 @@
     "deploy": "hardhat run scripts/deploy.ts --network arc-testnet",
     "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
     "docs": "typedoc",
-    "docs:watch": "typedoc --watch"
+    "docs:watch": "typedoc --watch",
+    "setup:wallets": "ts-node scripts/setup-testnet-wallets.ts",
+    "demo:payroll": "ts-node scripts/execute-demo-payroll.ts"
   },
   "keywords": [
     "arc",
