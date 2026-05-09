@@ -15,6 +15,15 @@ export function Header() {
             <Link href="/" className="text-body-s hover:text-green transition">
               Dashboard
             </Link>
+            <Link href="/invoices" className="text-body-s hover:text-green transition">
+              Invoices
+            </Link>
+            <Link href="/payroll" className="text-body-s hover:text-green transition">
+              Payroll
+            </Link>
+            <Link href="/transactions" className="text-body-s hover:text-green transition">
+              Transactions
+            </Link>
             <Link href="/demo" className="text-body-s hover:text-green transition">
               Quick Demo
             </Link>
