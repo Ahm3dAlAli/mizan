@@ -8,7 +8,7 @@
  * 4. Outputs wallet addresses and private keys
  */
 
-import { createWalletClient, createPublicClient, http, parseEther, formatEther } from 'viem';
+import { createPublicClient, http, formatEther } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -177,7 +177,7 @@ async function main() {
   console.log(`const treasuryAddress = "${treasuryWallet.address}";`);
   console.log('');
   console.log('// Recipients');
-  wallets.slice(1).forEach((wallet, i) => {
+  wallets.slice(1).forEach((wallet) => {
     const varName = wallet.name.split(' ')[0].toLowerCase();
     console.log(`const ${varName}Address = "${wallet.address}"; // ${wallet.name}`);
   });
