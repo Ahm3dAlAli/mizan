@@ -56,3 +56,4 @@ tmpclaude-*
 # Testnet wallet files (contain private keys)
 scripts/testnet-wallets.json
 scripts/payroll-transactions.json
+.vercel

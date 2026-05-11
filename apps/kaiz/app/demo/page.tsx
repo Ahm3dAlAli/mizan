@@ -1,8 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AgentActionCard } from '@/components/payroll/AgentActionCard';
 import { TransactionCard } from '@/components/payroll/TransactionCard';
+
+interface TreasuryInfo {
+  treasuryAddress: string;
+  balance: string;
+  network: string;
+  chainId: number;
+  usdcAddress: string;
+  explorer: string;
+  faucet: string;
+}
+
+interface Transaction {
+  id: string;
+  recipient: string;
+  amount: string;
+  currency: string;
+  corridor: string;
+  status: 'pending' | 'settled' | 'failed';
+  txHash?: string;
+  timestamp: string;
+  error?: string;
+}
 
 // Mock data for the demo - in production this comes from Supabase Realtime
 const mockPayrollRun = {
@@ -89,11 +111,90 @@ export default function DemoPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [visibleActions, setVisibleActions] = useState<number>(0);
   const [visibleTransactions, setVisibleTransactions] = useState<number>(0);
+  const [treasuryInfo, setTreasuryInfo] = useState<TreasuryInfo | null>(null);
+  const [realTransactions, setRealTransactions] = useState<Transaction[]>([]);
+  const [useRealTransactions, setUseRealTransactions] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const startDemo = () => {
+  // Fetch treasury info on mount
+  useEffect(() => {
+    fetchTreasuryInfo();
+  }, []);
+
+  const fetchTreasuryInfo = async () => {
+    try {
+      const response = await fetch('/api/payroll/execute');
+      if (response.ok) {
+        const data = await response.json();
+        setTreasuryInfo(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch treasury info:', err);
+    }
+  };
+
+  const executeRealPayroll = async () => {
+    setError(null);
+    try {
+      const transactions = [
+        {
+          recipient: 'Maria Santos',
+          amount: '8500',
+          currency: 'PHP',
+          corridor: 'UAE → Philippines',
+        },
+        {
+          recipient: 'Rajesh Kumar',
+          amount: '12000',
+          currency: 'INR',
+          corridor: 'UAE → India',
+        },
+        {
+          recipient: 'Ahmed Hassan',
+          amount: '6500',
+          currency: 'EGP',
+          corridor: 'UAE → Egypt',
+        },
+      ];
+
+      const response = await fetch('/api/payroll/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactions }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          setError(
+            `Insufficient balance. Treasury has ${data.balance} USDC but needs ${data.required} USDC. Fund wallet at: ${data.faucet}`
+          );
+        } else {
+          setError(data.error || 'Failed to execute payroll');
+        }
+        return null;
+      }
+
+      const txsWithIds = data.transactions.map((tx: any, i: number) => ({
+        ...tx,
+        id: `tx_${i + 1}`,
+      }));
+
+      setRealTransactions(txsWithIds);
+      await fetchTreasuryInfo(); // Refresh balance
+      return txsWithIds;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      return null;
+    }
+  };
+
+  const startDemo = async () => {
     setIsRunning(true);
     setVisibleActions(0);
     setVisibleTransactions(0);
+    setError(null);
 
     // Simulate agent actions appearing one by one
     mockPayrollRun.agentActions.forEach((_, index) => {
@@ -102,19 +203,41 @@ export default function DemoPage() {
       }, index * 3000);
     });
 
-    // Show transactions after all agents complete
-    setTimeout(() => {
-      mockPayrollRun.transactions.forEach((_, index) => {
-        setTimeout(() => {
-          setVisibleTransactions(index + 1);
-        }, index * 500);
-      });
-    }, mockPayrollRun.agentActions.length * 3000);
+    // Execute real transactions if enabled
+    if (useRealTransactions) {
+      setTimeout(async () => {
+        const txs = await executeRealPayroll();
+        if (txs) {
+          // Show transactions one by one
+          txs.forEach((_, index: number) => {
+            setTimeout(() => {
+              setVisibleTransactions(index + 1);
+            }, index * 500);
+          });
 
-    // Reset after demo completes
-    setTimeout(() => {
-      setIsRunning(false);
-    }, (mockPayrollRun.agentActions.length * 3000) + (mockPayrollRun.transactions.length * 500) + 2000);
+          // Reset after showing all transactions
+          setTimeout(() => {
+            setIsRunning(false);
+          }, txs.length * 500 + 2000);
+        } else {
+          setIsRunning(false);
+        }
+      }, mockPayrollRun.agentActions.length * 3000);
+    } else {
+      // Show mock transactions after all agents complete
+      setTimeout(() => {
+        mockPayrollRun.transactions.forEach((_, index) => {
+          setTimeout(() => {
+            setVisibleTransactions(index + 1);
+          }, index * 500);
+        });
+      }, mockPayrollRun.agentActions.length * 3000);
+
+      // Reset after demo completes
+      setTimeout(() => {
+        setIsRunning(false);
+      }, (mockPayrollRun.agentActions.length * 3000) + (mockPayrollRun.transactions.length * 500) + 2000);
+    }
   };
 
   return (
@@ -131,8 +254,60 @@ export default function DemoPage() {
           </p>
         </div>
 
+        {/* Treasury Info */}
+        {treasuryInfo && (
+          <div className="mb-6 p-4 bg-bg-elev rounded-lg border border-line shadow-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-body-s font-medium text-text-2">Treasury Wallet</h3>
+                <p className="text-body-xs text-text-3 font-mono">{treasuryInfo.treasuryAddress}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-body-s text-text-2">Balance</p>
+                <p className="text-h4 font-medium text-text">{treasuryInfo.balance} USDC</p>
+              </div>
+            </div>
+            {parseFloat(treasuryInfo.balance) < 0.1 && (
+              <div className="mt-3 p-3 bg-yellow/10 border border-yellow rounded-lg">
+                <p className="text-body-xs text-text-2">
+                  ⚠️ Low balance. Fund wallet at:{' '}
+                  <a
+                    href={treasuryInfo.faucet}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green hover:underline"
+                  >
+                    Arc Testnet Faucet
+                  </a>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red/10 border border-red rounded-lg">
+            <p className="text-body-s text-text">{error}</p>
+          </div>
+        )}
+
         {/* Demo Control */}
-        <div className="mb-8">
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={useRealTransactions}
+                onChange={(e) => setUseRealTransactions(e.target.checked)}
+                disabled={isRunning}
+                className="w-4 h-4 text-green bg-bg-2 border-line rounded focus:ring-green focus:ring-2"
+              />
+              <span className="text-body-s text-text-2">
+                Use real on-chain transactions (Arc Testnet)
+              </span>
+            </label>
+          </div>
           <button
             onClick={startDemo}
             disabled={isRunning}
@@ -142,7 +317,7 @@ export default function DemoPage() {
                 : 'bg-green text-bg-elev hover:bg-green-2'
             }`}
           >
-            {isRunning ? 'Running...' : 'Start Payroll Run'}
+            {isRunning ? 'Running...' : useRealTransactions ? 'Start Real Payroll Run' : 'Start Demo Payroll Run'}
           </button>
         </div>
 
@@ -173,21 +348,23 @@ export default function DemoPage() {
           <div>
             <h2 className="text-h3 font-medium mb-6 flex items-center gap-3 text-text">
               <div className="w-2 h-2 bg-green rounded-full" />
-              Completed Transactions
+              {useRealTransactions ? 'Real On-Chain Transactions' : 'Completed Transactions'}
             </h2>
             <div className="space-y-4">
-              {mockPayrollRun.transactions.slice(0, visibleTransactions).map((tx) => (
-                <TransactionCard
-                  key={tx.id}
-                  recipient={tx.recipient}
-                  amount={tx.amount}
-                  currency={tx.currency}
-                  corridor={tx.corridor}
-                  status={tx.status}
-                  txHash={tx.txHash}
-                  timestamp={tx.timestamp}
-                />
-              ))}
+              {(useRealTransactions ? realTransactions : mockPayrollRun.transactions)
+                .slice(0, visibleTransactions)
+                .map((tx) => (
+                  <TransactionCard
+                    key={tx.id}
+                    recipient={tx.recipient}
+                    amount={tx.amount}
+                    currency={tx.currency}
+                    corridor={tx.corridor}
+                    status={tx.status}
+                    txHash={tx.txHash}
+                    timestamp={tx.timestamp}
+                  />
+                ))}
             </div>
           </div>
         )}

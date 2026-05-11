@@ -110,7 +110,7 @@ async function main() {
     args: [treasuryAccount.address],
   });
 
-  const balanceUSDC = formatEther(balance);
+  const balanceUSDC = formatEther(balance as bigint);
   console.log(`   Balance: ${balanceUSDC} USDC\n`);
 
   if (parseFloat(balanceUSDC) < 100) {
