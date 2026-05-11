@@ -14,16 +14,35 @@ interface TreasuryInfo {
   faucet: string;
 }
 
+type AgentType = 'supervisor' | 'classifier' | 'treasurer' | 'gatekeeper' | 'payables';
+
+interface AgentAction {
+  id: string;
+  agent: AgentType;
+  action: string;
+  reasoning: string;
+  toolsCalled: string[];
+  timestamp: string;
+}
+
+interface ComplianceInfo {
+  passed: boolean;
+  risk_level: 'low' | 'medium' | 'high' | 'unknown';
+  checks_performed: string[];
+  details: string;
+}
+
 interface Transaction {
   id: string;
   recipient: string;
   amount: string;
   currency: string;
   corridor: string;
-  status: 'pending' | 'settled' | 'failed';
+  status: 'pending' | 'processing' | 'settled' | 'failed';
   txHash?: string;
   timestamp: string;
   error?: string;
+  compliance?: ComplianceInfo;
 }
 
 // Mock data for the demo - in production this comes from Supabase Realtime
@@ -34,7 +53,7 @@ const mockPayrollRun = {
   agentActions: [
     {
       id: '1',
-      agent: 'supervisor',
+      agent: 'supervisor' as AgentType,
       action: 'Route payroll request',
       reasoning: 'Analyzed 12 invoices totaling $45,230 USDC. Detected 3 destination countries (Philippines, India, Egypt). Routing to classifier agent for corridor determination.',
       toolsCalled: ['analyze_invoices', 'detect_destinations'],
@@ -42,7 +61,7 @@ const mockPayrollRun = {
     },
     {
       id: '2',
-      agent: 'classifier',
+      agent: 'classifier' as AgentType,
       action: 'Classify invoices by corridor',
       reasoning: 'Mapped invoices to corridors: 7 invoices → UAE-Philippines (AED→PHP), 3 invoices → UAE-India (AED→INR), 2 invoices → UAE-Egypt (AED→EGP). Total routing options available: 5 corridors.',
       toolsCalled: ['map_to_corridor', 'get_fx_rates'],
@@ -50,7 +69,7 @@ const mockPayrollRun = {
     },
     {
       id: '3',
-      agent: 'treasurer',
+      agent: 'treasurer' as AgentType,
       action: 'Check balance and optimize routing',
       reasoning: 'Treasury balance: 250,000 USDC. Required: 45,230 USDC + 520 USDC fees. ✅ Sufficient funds. Optimized routing for lowest fees: Philippines corridor (1.0%), India corridor (1.0%), Egypt corridor (0.8%).',
       toolsCalled: ['check_balance', 'optimize_routing', 'calculate_fees'],
@@ -58,15 +77,15 @@ const mockPayrollRun = {
     },
     {
       id: '4',
-      agent: 'gatekeeper',
-      action: 'Enforce compliance rules',
-      reasoning: 'Compliance checks: ✅ No sanctioned addresses detected. ✅ All recipients passed KYC verification. ✅ Transaction limits within corridor rules. ✅ Audit trail logged to Supabase. Ready for execution.',
-      toolsCalled: ['check_sanctions', 'verify_kyc', 'check_limits', 'log_audit'],
+      agent: 'gatekeeper' as AgentType,
+      action: 'Enforce compliance rules via Exa',
+      reasoning: 'Real-time compliance checks using Exa API: ✅ Sanctions screening via OFAC databases. ✅ Cross-border regulations verified for Philippines, India, Egypt corridors. ✅ All recipients cleared with low risk level. ✅ Payment corridor compliance confirmed. Ready for execution.',
+      toolsCalled: ['exa_sanctions_search', 'exa_corridor_compliance', 'verify_kyc', 'log_audit'],
       timestamp: new Date(Date.now() - 10000).toISOString(),
     },
     {
       id: '5',
-      agent: 'payables',
+      agent: 'payables' as AgentType,
       action: 'Execute payments via ArcPay',
       reasoning: 'Executed 12 transactions across 3 corridors. Settlement time: 2.8s average. Total fees: 520 USDC (1.15% effective rate). All transactions confirmed on Arc Testnet.',
       toolsCalled: ['execute_payment', 'confirm_settlement', 'update_status'],
@@ -80,9 +99,15 @@ const mockPayrollRun = {
       amount: '8500',
       currency: 'PHP',
       corridor: 'UAE → Philippines',
-      status: 'settled',
+      status: 'settled' as const,
       txHash: '0x742d35cc6634c0532925a3b844bc9e7fce3b1234abcd1234ef567890ab123456',
       timestamp: new Date(Date.now() - 4000).toISOString(),
+      compliance: {
+        passed: true,
+        risk_level: 'low' as const,
+        checks_performed: ['sanctions_screening', 'corridor_compliance'],
+        details: '✅ All compliance checks passed for Philippines corridor',
+      },
     },
     {
       id: 'tx_2',
@@ -90,9 +115,15 @@ const mockPayrollRun = {
       amount: '12000',
       currency: 'INR',
       corridor: 'UAE → India',
-      status: 'settled',
+      status: 'settled' as const,
       txHash: '0x8a93c67e46523fb89012def456789ab0123cdef45678901234567890abcdef12',
       timestamp: new Date(Date.now() - 3800).toISOString(),
+      compliance: {
+        passed: true,
+        risk_level: 'low' as const,
+        checks_performed: ['sanctions_screening', 'corridor_compliance'],
+        details: '✅ All compliance checks passed for India corridor',
+      },
     },
     {
       id: 'tx_3',
@@ -100,9 +131,15 @@ const mockPayrollRun = {
       amount: '6500',
       currency: 'EGP',
       corridor: 'UAE → Egypt',
-      status: 'settled',
+      status: 'settled' as const,
       txHash: '0x3f7e52ab9012cdef3456789ab0cd12ef34567890abcd1234567890ef12345678',
       timestamp: new Date(Date.now() - 3600).toISOString(),
+      compliance: {
+        passed: true,
+        risk_level: 'low' as const,
+        checks_performed: ['sanctions_screening', 'corridor_compliance'],
+        details: '✅ All compliance checks passed for Egypt corridor',
+      },
     },
   ],
 };
@@ -209,7 +246,7 @@ export default function DemoPage() {
         const txs = await executeRealPayroll();
         if (txs) {
           // Show transactions one by one
-          txs.forEach((_, index: number) => {
+          txs.forEach((_tx: Transaction, index: number) => {
             setTimeout(() => {
               setVisibleTransactions(index + 1);
             }, index * 500);
@@ -360,9 +397,10 @@ export default function DemoPage() {
                     amount={tx.amount}
                     currency={tx.currency}
                     corridor={tx.corridor}
-                    status={tx.status}
-                    txHash={tx.txHash}
+                    status={tx.status as 'pending' | 'processing' | 'settled' | 'failed'}
+                    txHash={tx.txHash || '0x0'}
                     timestamp={tx.timestamp}
+                    compliance={tx.compliance}
                   />
                 ))}
             </div>
@@ -392,7 +430,11 @@ export default function DemoPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green">→</span>
-                <span><strong className="text-text">Sub-3s settlement times</strong> with full compliance checks</span>
+                <span><strong className="text-text">Real-time compliance via Exa</strong> (sanctions + corridor checks)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green">→</span>
+                <span><strong className="text-text">Sub-3s settlement times</strong> on Arc Testnet</span>
               </li>
             </ul>
           </div>

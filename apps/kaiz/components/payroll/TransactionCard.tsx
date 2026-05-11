@@ -1,3 +1,10 @@
+interface ComplianceInfo {
+  passed: boolean;
+  risk_level: 'low' | 'medium' | 'high' | 'unknown';
+  checks_performed: string[];
+  details: string;
+}
+
 interface TransactionCardProps {
   recipient: string;
   amount: string;
@@ -6,6 +13,7 @@ interface TransactionCardProps {
   status: 'pending' | 'processing' | 'settled' | 'failed';
   txHash: string;
   timestamp: string;
+  compliance?: ComplianceInfo;
 }
 
 const statusConfig = {
@@ -43,6 +51,7 @@ export function TransactionCard({
   status,
   txHash,
   timestamp,
+  compliance,
 }: TransactionCardProps) {
   const config = statusConfig[status];
   const formattedTime = new Date(timestamp).toLocaleTimeString('en-US', {
@@ -75,6 +84,30 @@ export function TransactionCard({
           {parseFloat(amount).toLocaleString()} {currency}
         </div>
       </div>
+
+      {/* Compliance Badge */}
+      {compliance && (
+        <div className="mb-3 p-2 bg-bg-2 rounded border border-line">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-body-xs text-text-2">Compliance:</span>
+              <span className={`text-body-xs font-medium ${
+                compliance.risk_level === 'low' ? 'text-green' :
+                compliance.risk_level === 'medium' ? 'text-warn' :
+                'text-neg'
+              }`}>
+                {compliance.risk_level.toUpperCase()} RISK
+              </span>
+            </div>
+            <span className="text-body-xs text-text-3">
+              via Exa
+            </span>
+          </div>
+          {compliance.details && (
+            <p className="text-body-xs text-text-3 mt-1">{compliance.details}</p>
+          )}
+        </div>
+      )}
 
       {/* Transaction Details */}
       <div className="flex items-center justify-between text-body-s">

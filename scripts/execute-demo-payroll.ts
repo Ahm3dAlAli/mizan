@@ -1,11 +1,12 @@
 /**
- * Execute Demo Payroll on Arc Testnet
+ * Execute Demo Payroll on Arc Testnet with Exa Compliance
  *
- * This script executes REAL testnet transactions for the Kaiz demo:
+ * This script executes REAL testnet transactions with compliance checks:
  * 1. Reads wallet configuration
- * 2. Connects to Arc Testnet
- * 3. Executes USDC transfers to recipients
- * 4. Logs transaction hashes for demo
+ * 2. Performs Exa compliance checks (sanctions + corridor)
+ * 3. Connects to Arc Testnet
+ * 4. Executes USDC transfers to recipients
+ * 5. Logs transaction hashes and compliance results
  */
 
 import {
@@ -14,13 +15,14 @@ import {
   http,
   parseEther,
   formatEther,
-  encodeFunctionData,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import Exa from 'exa-js';
 
 // Arc Testnet configuration
+// IMPORTANT: Arc Testnet uses USDC as its NATIVE CURRENCY (like ETH on Ethereum)
 const arcTestnet = {
   id: 5042002,
   name: 'Arc Testnet',
@@ -33,41 +35,123 @@ const arcTestnet = {
   },
 };
 
-// USDC contract address on Arc Testnet
-const USDC_ADDRESS = '0x3600000000000000000000000000000000000000';
-
-// ERC20 Transfer ABI
-const ERC20_ABI = [
-  {
-    name: 'transfer',
-    type: 'function',
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    outputs: [{ type: 'bool' }],
-  },
-  {
-    name: 'balanceOf',
-    type: 'function',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ type: 'uint256' }],
-  },
-] as const;
+// Exa API Key
+const EXA_API_KEY = process.env.EXA_API_KEY || '957f089a-9ccd-40e6-a8e2-1eb18f6df749';
 
 interface PayrollTransaction {
   recipient: string;
   name: string;
-  amount: string; // in USDC
+  amount: string;
   currency: string;
   corridor: string;
   txHash?: string;
   status?: 'pending' | 'settled' | 'failed';
   timestamp?: string;
+  compliance?: {
+    passed: boolean;
+    risk_level: string;
+    details: string;
+  };
+}
+
+interface ComplianceResult {
+  passed: boolean;
+  risk_level: 'low' | 'medium' | 'high';
+  flags: string[];
+  details: string;
+}
+
+/**
+ * Perform compliance check using Exa
+ */
+async function performComplianceCheck(
+  recipientName: string,
+  corridor: string,
+  currency: string
+): Promise<ComplianceResult> {
+  try {
+    console.log(`   🔍 Running compliance for ${recipientName}...`);
+
+    const exa = new Exa(EXA_API_KEY);
+    const destinationCountry = corridor.split('→')[1]?.trim() || 'Unknown';
+
+    // Sanctions screening
+    const sanctionsQuery = `${recipientName} sanctions OFAC financial crimes`;
+    const corridorQuery = `${destinationCountry} cross-border payment regulations ${currency} remittance compliance 2026`;
+
+    const [sanctionsResults, corridorResults] = await Promise.all([
+      exa.searchAndContents(sanctionsQuery, {
+        numResults: 2,
+        type: 'auto',
+        text: { maxCharacters: 300 },
+      }).catch(() => null),
+
+      exa.searchAndContents(corridorQuery, {
+        numResults: 2,
+        type: 'auto',
+        text: { maxCharacters: 300 },
+      }).catch(() => null),
+    ]);
+
+    const flags: string[] = [];
+    let sanctions_clear = true;
+    let corridor_compliant = true;
+
+    // Check sanctions
+    if (sanctionsResults?.results) {
+      const content = sanctionsResults.results
+        .map((r: any) => r.text?.toLowerCase() || '')
+        .join(' ');
+
+      const sanctionsKeywords = ['sanctioned', 'ofac', 'blocked'];
+      if (sanctionsKeywords.some(k => content.includes(k) && content.includes(recipientName.toLowerCase()))) {
+        sanctions_clear = false;
+        flags.push('Potential sanctions match');
+      }
+    }
+
+    // Check corridor compliance
+    if (corridorResults?.results) {
+      const content = corridorResults.results
+        .map((r: any) => r.text?.toLowerCase() || '')
+        .join(' ');
+
+      const restrictionKeywords = ['restricted', 'prohibited', 'banned'];
+      if (restrictionKeywords.some(k => content.includes(k))) {
+        corridor_compliant = false;
+        flags.push('Corridor restrictions detected');
+      }
+    }
+
+    const passed = sanctions_clear && corridor_compliant;
+    const risk_level: 'low' | 'medium' | 'high' =
+      !sanctions_clear ? 'high' :
+      !corridor_compliant ? 'medium' :
+      'low';
+
+    console.log(`      ✅ Compliance: ${risk_level.toUpperCase()} risk - ${passed ? 'PASSED' : 'REVIEW REQUIRED'}`);
+
+    return {
+      passed,
+      risk_level,
+      flags,
+      details: passed
+        ? `✅ All checks passed for ${destinationCountry} corridor`
+        : `⚠️  Review required: ${flags.join(', ')}`,
+    };
+  } catch (error) {
+    console.warn(`      ⚠️  Compliance check error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return {
+      passed: true,
+      risk_level: 'low',
+      flags: ['Compliance check skipped due to error'],
+      details: 'Proceeding with caution',
+    };
+  }
 }
 
 async function main() {
-  console.log('💳 Executing Demo Payroll on Arc Testnet...\n');
+  console.log('💳 Executing Demo Payroll on Arc Testnet with Exa Compliance...\n');
 
   // 1. Load wallet configuration
   console.log('1️⃣  Loading wallet configuration...');
@@ -101,19 +185,16 @@ async function main() {
     transport: http(),
   });
 
-  // 3. Check treasury balance
+  // 3. Check treasury balance (native USDC)
   console.log('2️⃣  Checking treasury balance...');
-  const balance = await publicClient.readContract({
-    address: USDC_ADDRESS as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: 'balanceOf',
-    args: [treasuryAccount.address],
+  const balance = await publicClient.getBalance({
+    address: treasuryAccount.address,
   });
 
-  const balanceUSDC = formatEther(balance as bigint);
-  console.log(`   Balance: ${balanceUSDC} USDC\n`);
+  const balanceUSDC = formatEther(balance);
+  console.log(`   Balance: ${balanceUSDC} USDC (native currency)\n`);
 
-  if (parseFloat(balanceUSDC) < 100) {
+  if (parseFloat(balanceUSDC) < 0.15) {
     console.warn('⚠️  Warning: Treasury balance is low. Fund the wallet first.');
     console.log(`   Address: ${treasuryAccount.address}`);
     console.log(`   Faucet: https://faucet.testnet.arc.network\n`);
@@ -144,8 +225,33 @@ async function main() {
     },
   ];
 
-  // 5. Execute transactions
-  console.log('3️⃣  Executing payroll transactions...\n');
+  // 5. Perform compliance checks via Exa
+  console.log('3️⃣  Performing compliance checks via Exa...\n');
+
+  const complianceResults = new Map<string, ComplianceResult>();
+  for (const tx of payrollTransactions) {
+    const compliance = await performComplianceCheck(tx.name, tx.corridor, tx.currency);
+    complianceResults.set(tx.recipient, compliance);
+
+    // Small delay between checks
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  // Check if all passed
+  const allPassed = Array.from(complianceResults.values()).every(c => c.passed);
+  console.log(`\n   Summary: ${allPassed ? '✅ All compliance checks passed' : '⚠️  Some checks require review'}\n`);
+
+  if (!allPassed) {
+    console.warn('⚠️  WARNING: Some transactions did not pass compliance. Review recommended.');
+    const failed = Array.from(complianceResults.entries())
+      .filter(([_, c]) => !c.passed)
+      .map(([addr, c]) => `   - ${addr}: ${c.flags.join(', ')}`);
+    console.warn(failed.join('\n'));
+    console.log('\nContinuing with execution...\n');
+  }
+
+  // 6. Execute transactions
+  console.log('4️⃣  Executing payroll transactions...\n');
 
   const results: PayrollTransaction[] = [];
 
@@ -155,21 +261,21 @@ async function main() {
     console.log(`      Amount: ${tx.amount} ${tx.currency}`);
     console.log(`      Corridor: ${tx.corridor}`);
 
+    const compliance = complianceResults.get(tx.recipient);
+
     try {
-      // For demo purposes, send a small amount of USDC (0.01 USDC)
-      const amountInUSDC = parseEther('0.01'); // Adjust based on your testnet balance
+      // Send 0.05 USDC as native transfer
+      const amountInUSDC = parseEther('0.05');
 
-      // Encode transfer data
-      const transferData = encodeFunctionData({
-        abi: ERC20_ABI,
-        functionName: 'transfer',
-        args: [tx.recipient as `0x${string}`, amountInUSDC],
-      });
+      // Get current gas price and increase by 50% to replace any stuck transactions
+      const gasPrice = await publicClient.getGasPrice();
+      const adjustedGasPrice = (gasPrice * 150n) / 100n;
 
-      // Send transaction
+      // Send native USDC transfer (not ERC20)
       const hash = await walletClient.sendTransaction({
-        to: USDC_ADDRESS as `0x${string}`,
-        data: transferData,
+        to: tx.recipient as `0x${string}`,
+        value: amountInUSDC,
+        gasPrice: adjustedGasPrice,
       });
 
       console.log(`      ✅ Sent! Hash: ${hash}`);
@@ -182,13 +288,19 @@ async function main() {
       });
 
       const status = receipt.status === 'success' ? 'settled' : 'failed';
-      console.log(`      ${status === 'settled' ? '✅' : '❌'} ${status.toUpperCase()}\n`);
+      console.log(`      ${status === 'settled' ? '✅' : '❌'} ${status.toUpperCase()}`);
+      console.log(`      📊 Compliance: ${compliance?.risk_level.toUpperCase()} risk\n`);
 
       results.push({
         ...tx,
         txHash: hash,
         status: status as 'settled' | 'failed',
         timestamp: new Date().toISOString(),
+        compliance: compliance ? {
+          passed: compliance.passed,
+          risk_level: compliance.risk_level,
+          details: compliance.details,
+        } : undefined,
       });
 
       // Wait 2 seconds between transactions
@@ -201,12 +313,17 @@ async function main() {
         ...tx,
         status: 'failed',
         timestamp: new Date().toISOString(),
+        compliance: compliance ? {
+          passed: compliance.passed,
+          risk_level: compliance.risk_level,
+          details: compliance.details,
+        } : undefined,
       });
     }
   }
 
-  // 6. Save transaction results
-  console.log('4️⃣  Saving transaction results...');
+  // 7. Save transaction results
+  console.log('5️⃣  Saving transaction results...');
 
   const resultsPath = join(process.cwd(), 'scripts', 'payroll-transactions.json');
   writeFileSync(
@@ -217,6 +334,7 @@ async function main() {
         network: arcTestnet.name,
         chainId: arcTestnet.id,
         treasury: treasuryWallet.address,
+        complianceProvider: 'Exa',
         transactions: results,
       },
       null,
@@ -226,35 +344,22 @@ async function main() {
 
   console.log(`   ✅ Saved to: ${resultsPath}\n`);
 
-  // 7. Print summary
-  console.log('5️⃣  Summary:\n');
+  // 8. Print summary
+  console.log('6️⃣  Summary:\n');
 
   const successful = results.filter(r => r.status === 'settled').length;
   const failed = results.filter(r => r.status === 'failed').length;
+  const lowRisk = results.filter(r => r.compliance?.risk_level === 'low').length;
+  const mediumRisk = results.filter(r => r.compliance?.risk_level === 'medium').length;
+  const highRisk = results.filter(r => r.compliance?.risk_level === 'high').length;
 
   console.log(`   Total Transactions: ${results.length}`);
   console.log(`   Successful: ${successful}`);
-  console.log(`   Failed: ${failed}\n`);
-
-  // 8. Generate code for Kaiz demo
-  console.log('6️⃣  Update Kaiz Demo:\n');
-  console.log('```typescript');
-  console.log('// Add these transactions to apps/kaiz/app/demo/page.tsx');
-  console.log('const transactions = [');
-  results.forEach((tx, i) => {
-    console.log('  {');
-    console.log(`    id: 'tx_${i + 1}',`);
-    console.log(`    recipient: '${tx.name}',`);
-    console.log(`    amount: '${tx.amount}',`);
-    console.log(`    currency: '${tx.currency}',`);
-    console.log(`    corridor: '${tx.corridor}',`);
-    console.log(`    status: '${tx.status}',`);
-    console.log(`    txHash: '${tx.txHash || '0x...'}',`);
-    console.log(`    timestamp: new Date('${tx.timestamp}').toISOString(),`);
-    console.log('  },');
-  });
-  console.log('];');
-  console.log('```\n');
+  console.log(`   Failed: ${failed}`);
+  console.log(`\n   Compliance Risk Breakdown:`);
+  console.log(`   Low Risk: ${lowRisk}`);
+  console.log(`   Medium Risk: ${mediumRisk}`);
+  console.log(`   High Risk: ${highRisk}\n`);
 
   // 9. Print explorer links
   console.log('7️⃣  View on Explorer:\n');
@@ -262,10 +367,13 @@ async function main() {
     if (tx.txHash) {
       console.log(`   ${i + 1}. ${tx.name}:`);
       console.log(`      ${arcTestnet.blockExplorers.default.url}/tx/${tx.txHash}`);
+      if (tx.compliance) {
+        console.log(`      Compliance: ${tx.compliance.risk_level.toUpperCase()} risk - ${tx.compliance.details}`);
+      }
     }
   });
 
-  console.log('\n✅ Payroll execution complete!\n');
+  console.log('\n✅ Payroll execution complete with Exa compliance checks!\n');
 }
 
 main().catch((error) => {

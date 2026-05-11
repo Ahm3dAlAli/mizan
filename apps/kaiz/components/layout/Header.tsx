@@ -27,6 +27,9 @@ export function Header() {
             <Link href="/demo" className="text-body-s hover:text-green transition">
               Quick Demo
             </Link>
+            <Link href="/two-party-demo" className="text-body-s hover:text-green transition">
+              Two-Party Demo
+            </Link>
             <div className="px-4 py-2 bg-green-tint rounded-lg text-body-s">
               <span className="text-green">Testnet</span>
             </div>
