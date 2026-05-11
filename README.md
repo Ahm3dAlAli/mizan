@@ -1,4 +1,4 @@
-# ArcPay - Mizan & Kaiz
+# Mizan
 
 **Agentic payment infrastructure for cross-border payments powered by Circle and Arc Network**
 
@@ -10,8 +10,8 @@
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/your-repo/arcpay-main.git
-cd arcpay-main
+git clone https://github.com/ahm3dalali/mizan
+cd mizan
 npm install
 ```
 
